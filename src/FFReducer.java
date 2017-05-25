@@ -172,7 +172,7 @@ public class FFReducer extends MapReduceBase implements Reducer<IntArray, FloatA
 				fs.mkdirs(path);
 			}
 
-			fp += "/" + c  + index + "." + iter;
+			fp += "/" + c  + index + "" + iter;
 			path = new Path(fp);
 			if (!fs.exists(path)) {
 				fs.createNewFile(path);
@@ -191,7 +191,7 @@ public class FFReducer extends MapReduceBase implements Reducer<IntArray, FloatA
 			fs.mkdirs(path);
 		}
 
-		fp += "/" + c + index + "." + taskId;
+		fp += "/" + c + index + "" + taskId;
 		FSDataOutputStream out = fs.create(new Path(fp));
 
 		System.out.println("Write to " + fp);
@@ -252,7 +252,7 @@ public class FFReducer extends MapReduceBase implements Reducer<IntArray, FloatA
 		FileSystem fs = FileSystem.get(thisjob);
 
 		if(iter >= 0) {
-			String logfile = outputPath + "/log/" + c + index + "." + iter;
+			String logfile = outputPath + "/log/" + c + index + "" + iter;
 			System.out.println("Check log: " + c + index + ", " + iter + ": " + logfile);
 			if(!checkForFile(logfile,fs)) {
 				fs.close();

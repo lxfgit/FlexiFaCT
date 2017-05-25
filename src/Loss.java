@@ -144,7 +144,7 @@ public class Loss extends Configured implements Tool  {
 
 			if(iter >= 0) {
 				System.out.println("Check log: " + c + index + ", " + iter);
-				String logfile = outputPath + "/log/" + c + index + "." + iter;
+				String logfile = outputPath + "/log/" + c + index + "" + iter;
 				if(!checkForFile(logfile,fs)) {
 					fs.close();
 					return false;
