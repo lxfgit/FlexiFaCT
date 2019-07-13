@@ -1,74 +1,98 @@
-FlexiFaCT
-====
+###for()、增强for()、foreach()、stream().foreach()
+------------
 
-FlexiFaCT is a system for performing scalable matrix, tensor, and coupled
-matrix-tensor factorization on top of standard, stock Hadoop.  The system is
-flexible to different objectives, including non-negative factorization and
-sparse factorization.  Through careful partitioning of both the data and the
-model, our system can scale to big data and models with even billions of
-parameters.
-
-For details of the algorithm and implementation (such as how to set parameters)
-see [1], and if you are interested in this direction of research you can check
-out our follow up work in [2]. 
-
-
-Running
-====
-
-The implementation of FlexiFaCT has been tested on Hadoop 0.20.1 and Java (but
-can likely be run on other versions of Hadoop).
-
-Include in your bashrc:
-
-```bash
-export PATH=$PATH:/hadoop/hadoop-current/bin
-export PATH=$PATH:/hadoop/jdk-current/bin
-
-alias hls='hadoop fs -ls '
-alias hput='hadoop fs -put '
-alias hmv='hadoop fs -mv '
-alias hmkdir='hadoop fs -mkdir '
-alias hcat='hadoop fs -cat '
-
+* **测试一**
+```java
+public class TestFor {
+    private static void doSome(String s) {
+    }
+    public static void main(String[] args) {
+        /*添加数据*/
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add("第" + i + "条数据");
+        }
+        /*for循环*/
+        long st1 = System.currentTimeMillis();
+        for (int i = 0; i < list.size(); i++) {
+            doSome(list.get(i));
+        }
+        /*增强for循环*/
+        long st2 = System.currentTimeMillis();
+        for (String s : list) {
+            doSome(s);
+        }
+        /*foreach*/
+        long st3 = System.currentTimeMillis();
+        list.forEach(s -> doSome(s));
+        /*stream.foreach*/
+        long st4 = System.currentTimeMillis();
+        list.stream().forEach(s -> doSome(s));
+        long st5 = System.currentTimeMillis();
+        print(st1, st2, st3, st4, st5);
+    }
+    /*时间输出*/
+	public static void print(long s1, long s2, long s3, long s4, long s5) {
+        System.out.println("for           循环: " + (s2 - s1) + "ms");
+        System.out.println("增强for       循环: " + (s3 - s2) + "ms");
+        System.out.println("foreach       循环：" + (s4 - s3) + "ms");
+        System.out.println("stream.foreach循环：" + (s5 - s4) + "ms");
+    }
+}
 ```
+**结果：**
 
-You must also have the `HADOOP_HOME` and `HADOOP_CORE` set to compile the
-necessary jar files in the `build.sh` script.
+		for           循环: 0ms
+		增强for       循环: 0ms
+		foreach       循环：129ms
+		stream.foreach循环：3ms
+------------
 
-An example of running the script can be found in `run.sh` but make sure to
-change the appropriate directories.  
+* **测试二**
+```java
+List<String> list = new ArrayList<>();
+for (int i = 0; i < 1000; i++) {
+	list.add("第" + i + "条数据");
+}
+```
+**结果：**
 
-Test data can be generated with `makebig.py`.
+		for           循环: 1ms
+		增强for       循环: 1ms
+		foreach       循环：121ms
+		stream.foreach循环：3ms
+------------
 
-Authors
-=======
+* **测试三**
+```java
+List<String> list = new ArrayList<>();
+for (int i = 0; i < 1000000; i++) {
+	list.add("第" + i + "条数据");
+}
+```
+**结果：**
 
-FlexiFaCT is developed by:
+		for           循环: 17ms
+		增强for       循环: 23ms
+		foreach       循环：165ms
+		stream.foreach循环：18ms
+------------
 
-Alex Beutel, Carnegie Mellon University - http://alexbeutel.com/
+* **测试四**
+```java
+private static void doSome(String s) {
+	try {
+		Thread.sleep(1);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+}
+```
+**结果：**
 
-Abhimanu Kumar, Carnegie Mellon University  - http://www.abhimanukumar.com/
-
-Evangelos Papalexakis, Carnegie Mellon University  - http://www.cs.cmu.edu/~epapalex/
-
-Partha Pratim Talukdar, Carnegie Mellon University  - http://talukdar.net/
-
-Christos Faloutsos, Carnegie Mellon University  - http://www.cs.cmu.edu/~christos/
-
-Eric P. Xing, Carnegie Mellon University  - http://www.cs.cmu.edu/~epxing/
+		for           循环: 184ms
+		增强for       循环: 169ms
+		foreach       循环：224ms
+		stream.foreach循环：116ms
 
 
-References
-====
-
-[1] Alex Beutel, Abhimanu Kumar, Evangelos Papalexakis, Partha Pratim Talukdar,
-Christos Faloutsos, Eric P. Xing.  "FlexiFaCT: Scalable Flexible Factorization
-of Coupled Tensors on Hadoop."  2014 SIAM International Conference on Data
-Mining (SDM).  
-[PDF](http://alexbeutel.com/papers/sdm2014.flexifact.pdf)
-
-[2] Abhimanu Kumar, Alex Beutel, Qirong Ho, Eric P. Xing.
-"Fugue: Slow-Worker-Agnostic Distributed Learning for Big Models."
-17th International Conference on Artificial Intelligence and Statistics (AISTATS), 2014. 
-[PDF](http://alexbeutel.com/papers/aistats2014.fugue.pdf)
